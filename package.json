@@ -1,0 +1,20 @@
+{
+  "name": "domino-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/engine",
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "test": "npm run test --workspace=@domino/engine",
+    "test:all": "npm run test --workspace=@domino/engine && npm run test --workspace=@domino/server",
+    "db:migrate": "node database/migrate.js schema",
+    "db:seed": "node database/migrate.js seed"
+  },
+  "devDependencies": {
+    "pg-mem": "^3.0.14"
+  }
+}

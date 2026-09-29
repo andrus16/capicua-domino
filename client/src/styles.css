@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---- Capicúa: mesa viva ---- */
+
+.tile-pop { animation: pop .25s ease-out; }
+@keyframes pop { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* Entrada de cada ficha en la mesa: cae con pequeño giro y rebote */
+.board-tile { animation: drop-in .38s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes drop-in {
+  0% { transform: translateY(-26px) rotate(-8deg) scale(.7); opacity: 0; }
+  60% { transform: translateY(3px) rotate(2deg) scale(1.04); opacity: 1; }
+  100% { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+}
+
+/* Última jugada: aro dorado pulsante */
+.last-move { animation: last-glow 1.6s ease-in-out infinite; }
+@keyframes last-glow {
+  0%, 100% { box-shadow: 0 0 0 3px #fbbf24, 0 0 14px 4px rgba(251, 191, 36, .8); }
+  50% { box-shadow: 0 0 0 3px #fbbf24, 0 0 4px 1px rgba(251, 191, 36, .4); }
+}
+
+/* Fichas jugables: respiración verde para invitar al toque */
+.playable-breathe { animation: breathe 1.4s ease-in-out infinite; }
+@keyframes breathe {
+  0%, 100% { box-shadow: 0 0 0 2px #34d399, 0 0 10px 2px rgba(52, 211, 153, .55); }
+  50% { box-shadow: 0 0 0 2px #34d399, 0 0 2px 0 rgba(52, 211, 153, .25); }
+}
+
+/* Botón de robar cuando es la única salida: pulso ámbar */
+.draw-pulse { animation: draw-pulse 1.1s ease-in-out infinite; }
+@keyframes draw-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(251, 191, 36, .7); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(251, 191, 36, 0); }
+}
+
+/* Puntos de "bots pensando…" */
+.think-dot { animation: blink 1.2s infinite; display: inline-block; }
+.think-dot:nth-child(2) { animation-delay: .2s; }
+.think-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes blink { 0%, 100% { opacity: .2; } 50% { opacity: 1; } }
+
+/* Modal de fin de ronda: entra con zoom */
+.modal-pop { animation: modal-in .3s cubic-bezier(.2, 1.4, .4, 1); }
+@keyframes modal-in { from { transform: scale(.7) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+/* Confeti del ganador (piezas cayendo) */
+.confetti { position: absolute; top: -12px; animation: fall linear infinite; }
+@keyframes fall { to { transform: translateY(420px) rotate(720deg); opacity: .9; } }
+
+/* Tapete: fieltro con viñeta radial */
+.felt {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, .12), transparent 60%),
+    radial-gradient(ellipse at center, #059669 0%, #047857 55%, #065f46 100%);
+}
+.felt-dark {
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(255, 255, 255, .06), transparent 60%),
+    radial-gradient(ellipse at center, #064e3b 0%, #022c22 70%, #010f0c 100%);
+}
+
+/* Turno activo en el marcador */
+.turn-chip { animation: chip-glow 1.2s ease-in-out infinite; }
+@keyframes chip-glow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+
+/* ---- Fondo animado de la portada: fichas a la deriva ---- */
+@keyframes drift-a {
+  0%, 100% { transform: translate(0, 0) rotate(-6deg); }
+  50% { transform: translate(26px, -34px) rotate(7deg); }
+}
+@keyframes drift-b {
+  0%, 100% { transform: translate(0, 0) rotate(5deg); }
+  50% { transform: translate(-30px, 26px) rotate(-8deg); }
+}
+@keyframes drift-c {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(18px, 30px) rotate(10deg); }
+}
+
+/* ---- Cuenta + ranking PRO ---- */
+
+/* Botón de cuenta: resplandor ámbar pulsante */
+.account-glow { animation: account-glow 2s ease-in-out infinite; }
+@keyframes account-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, .65), 0 2px 8px rgba(0, 0, 0, .25); }
+  50% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0), 0 2px 14px rgba(251, 191, 36, .55); }
+}
+
+/* Entrada del desplegable: crece desde arriba-derecha */
+.panel-in { animation: panel-in .28s cubic-bezier(.2, 1.4, .4, 1); transform-origin: top right; }
+@keyframes panel-in {
+  from { transform: scale(.85) translateY(-10px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* Barrido de luz sobre cabeceras */
+.shine-wrap { position: relative; overflow: hidden; }
+.shine-wrap::after {
+  content: ""; position: absolute; top: 0; bottom: 0; width: 45%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .55), transparent);
+  animation: shine 3.2s ease-in-out infinite;
+}
+@keyframes shine {
+  0% { left: -50%; }
+  55%, 100% { left: 115%; }
+}
+
+/* Filas del ranking: entrada escalonada */
+.rank-row { animation: rank-in .4s ease-out both; }
+@keyframes rank-in {
+  from { transform: translateX(18px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Podio top-3 */
+.medal-1 {
+  background: linear-gradient(135deg, #fef3c7, #fcd34d 60%, #f59e0b);
+  box-shadow: 0 0 12px 2px rgba(245, 158, 11, .55);
+  animation: medal-pulse 2.2s ease-in-out infinite;
+}
+.medal-2 { background: linear-gradient(135deg, #f1f5f9, #cbd5e1 60%, #94a3b8); box-shadow: 0 0 8px 1px rgba(148, 163, 184, .5); }
+.medal-3 { background: linear-gradient(135deg, #ffedd5, #fdba74 60%, #c2703d); box-shadow: 0 0 8px 1px rgba(194, 112, 61, .5); }
+@keyframes medal-pulse {
+  0%, 100% { box-shadow: 0 0 10px 2px rgba(245, 158, 11, .55); }
+  50% { box-shadow: 0 0 20px 6px rgba(245, 158, 11, .8); }
+}
+
+/* Trofeo del título: balanceo */
+.trophy { display: inline-block; animation: trophy-rock 2.4s ease-in-out infinite; }
+@keyframes trophy-rock {
+  0%, 100% { transform: rotate(-10deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.15); }
+}
