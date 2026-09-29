@@ -1,0 +1,28 @@
+# Capicúa en Render (gratis): backend Node + frontend estático.
+# La BD va en Neon (gratis): pega su URL en DATABASE_URL del backend.
+services:
+  - type: web
+    name: capicua-api
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server/src/index.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: DATABASE_URL
+        sync: false # pegar la URL de Neon (dashboard del servicio)
+      - key: JWT_SECRET
+        generateValue: true # Render genera y guarda un secreto
+      - key: CLIENT_URL
+        sync: false # pegar la URL del frontend, ej. https://capicua.onrender.com
+  - type: web
+    name: capicua
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build --workspace=@domino/client
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false # pegar la URL del backend, ej. https://capicua-api.onrender.com

@@ -77,6 +77,15 @@ function maybeCloseRound(game) {
   return false;
 }
 
+/** Limpieza anti-DoS: borra partidas abandonadas hace más de maxAgeMs. */
+export function cleanupSoloGames(maxAgeMs = 2 * 3600_000, now = Date.now()) {
+  let removed = 0;
+  for (const [id, g] of games) {
+    if (now - g.createdAt > maxAgeMs) { games.delete(id); removed += 1; }
+  }
+  return removed;
+}
+
 export function humanPlay(gameId, tile, side) {
   const game = getSoloGame(gameId);
   if (!game) throw new Error("Partida no encontrada");

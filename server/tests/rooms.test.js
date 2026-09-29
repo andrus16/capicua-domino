@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {
   createStore, createRoom, joinRoom, leaveRoom, startGame,
   playTile, drawTileRoom, passTurnRoom, nextRound,
-  publicStateFor, lobbyRooms, seatOf, autoPlay, gameResultData,
+  publicStateFor, lobbyRooms, seatOf, autoPlay, gameResultData, cleanupRooms,
 } from "../src/game/rooms.js";
 
 const A = { userId: 1, username: "alba", guest: false };
@@ -126,5 +126,13 @@ describe("rooms partida", () => {
     assert.equal(seatOf(room, "sA"), 0);
     assert.equal(seatOf(room, "sB"), 1);
     assert.equal(seatOf(room, "nadie"), -1);
+  });
+
+  it("cleanupRooms disuelve lobbies viejos", () => {
+    const s = createStore();
+    const lobbyRoom = createRoom(s, { socketId: "sA", user: A, maxPlayers: 2 });
+    assert.equal(cleanupRooms(s, 2 * 3600_000, Date.now()), 0); // reciente: nada
+    assert.equal(cleanupRooms(s, 0, Date.now() + 3 * 3600_000), 1); // vieja: fuera
+    assert.equal(s.rooms.has(lobbyRoom.code), false);
   });
 });

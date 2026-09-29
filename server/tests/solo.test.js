@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { createSoloGame, humanPlay, humanDraw, humanPass, publicSoloState, nextRound, botStep } from "../src/game/soloStore.js";
+import { createSoloGame, humanPlay, humanDraw, humanPass, publicSoloState, getSoloGame, nextRound, botStep, cleanupSoloGames } from "../src/game/soloStore.js";
 
 describe("soloStore", () => {
   it("crea partida 1 humano + 1 bot con vista pública oculta", () => {
@@ -98,5 +98,12 @@ describe("soloStore", () => {
     // Si en 30 intentos no se dio el caso, al menos validar el error guiado.
     const g = createSoloGame({ numBots: 1, level: "easy" });
     assert.throws(() => humanDraw("id_inexistente"), /no encontrada/i);
+  });
+
+  it("cleanupSoloGames borra partidas viejas", () => {
+    const g = createSoloGame({ numBots: 1 });
+    assert.equal(cleanupSoloGames(2 * 3600_000, Date.now()), 0); // reciente: nada
+    assert.ok(cleanupSoloGames(0, Date.now() + 3 * 3600_000) >= 1); // vieja: fuera
+    assert.equal(getSoloGame(g.id), null);
   });
 });

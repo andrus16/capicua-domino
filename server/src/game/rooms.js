@@ -21,6 +21,7 @@ export function createStore() {
 }
 
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin 0/O/1/I confusos
+const MAX_ROOMS = 500; // anti-DoS: tope de salas en memoria
 export function makeCode(rng = Math.random) {
   let s = "";
   for (let i = 0; i < 6; i++) s += CODE_CHARS[Math.floor(rng() * CODE_CHARS.length)];
@@ -50,6 +51,7 @@ export function seatOf(room, socketId) {
 
 export function createRoom(store, { socketId, user, maxPlayers = 4, targetScore = 100 }) {
   if (findRoomOf(store, socketId)) throw new Error("Ya estás en una sala (sal antes de crear otra)");
+  if (store.rooms.size >= MAX_ROOMS) throw new Error("Hay demasiadas salas abiertas, intenta en unos minutos");
   const n = Number(maxPlayers);
   if (![2, 3, 4].includes(n)) throw new Error("La sala debe ser de 2-4 jugadores");
   const t = Number(targetScore);
@@ -291,6 +293,18 @@ export function lobbyRooms(store) {
       targetScore: r.targetScore,
       players: r.players.map((p) => p.username),
     }));
+}
+
+/** Limpieza anti-DoS: disuelve salas en lobby abandonadas hace más de maxAgeMs. */
+export function cleanupRooms(store, maxAgeMs = 2 * 3600_000, now = Date.now()) {
+  let removed = 0;
+  for (const [code, room] of store.rooms) {
+    if (room.status === "lobby" && now - room.createdAt > maxAgeMs) {
+      store.rooms.delete(code);
+      removed += 1;
+    }
+  }
+  return removed;
 }
 
 /** Datos para persistir el resultado (saveGameResult). */

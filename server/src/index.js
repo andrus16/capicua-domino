@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -9,7 +10,9 @@ import {
   createStore, getRoom, findRoomOf, seatOf, createRoom, joinRoom, leaveRoom,
   markDisconnected, startGame, playTile, drawTileRoom, passTurnRoom,
   autoPlay, nextRound as nextOnlineRound, publicStateFor, lobbyRooms, gameResultData,
+  cleanupRooms,
 } from "./game/rooms.js";
+import { cleanupSoloGames } from "./game/soloStore.js";
 import { verifyToken } from "./auth/jwt.js";
 import { authRouter } from "./routes/auth.js";
 import { statsRouter } from "./routes/stats.js";
@@ -19,6 +22,8 @@ const PORT = Number(process.env.PORT ?? 3001);
 const CLIENT_URL = process.env.CLIENT_URL ?? "http://localhost:5173";
 
 const app = express();
+app.set("trust proxy", 1); // Render/CDN: IP real para el rate-limit
+app.use(helmet({ contentSecurityPolicy: false })); // cabeceras seguras (sin CSP: la app es SPA simple)
 app.use(cors({ origin: CLIENT_URL.split(",").map((s) => s.trim()), credentials: true }));
 app.use(express.json({ limit: "64kb" }));
 app.use(rateLimit({ windowMs: 60_000, max: 300 }));
@@ -321,3 +326,17 @@ io.on("connection", (socket) => {
 httpServer.listen(PORT, () => {
   console.log(`[domino-server] escuchando en :${PORT} (CLIENT_URL=${CLIENT_URL})`);
 });
+
+// Limpieza periódica anti-DoS (partidas solo y salas lobby abandonadas).
+setInterval(() => {
+  try {
+    const a = cleanupSoloGames();
+    const b = cleanupRooms(lobby);
+    for (const code of [...turnTimers.keys()]) {
+      if (!lobby.rooms.has(code)) clearTurnTimer(code);
+    }
+    if (a + b > 0) console.log(`[limpieza] ${a} solo + ${b} salas eliminadas`);
+  } catch (e) {
+    console.error("[limpieza]", e.message);
+  }
+}, 15 * 60_000);
