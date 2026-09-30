@@ -27,7 +27,7 @@ export default function App() {
   const [dark, toggleDark] = useDark();
   const [muted, setMuted] = useState(isMuted());
   const [screen, setScreen] = useState("inicio"); // inicio | mesa | online
-  const [cfg, setCfg] = useState({ numBots: 1, level: "medium", targetScore: 100 });
+  const [cfg, setCfg] = useState({ numBots: 1, level: "medium", targetScore: 50 });
   const [game, setGame] = useState(null);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState("");
@@ -214,7 +214,7 @@ export default function App() {
             <label className="block">
               <span className="text-sm font-semibold">Puntos para ganar la partida</span>
               <input type="number" min={10} max={500} step={10} value={cfg.targetScore}
-                onChange={(e) => setCfg({ ...cfg, targetScore: Number(e.target.value) || 100 })}
+                onChange={(e) => setCfg({ ...cfg, targetScore: Number(e.target.value) || 50 })}
                 className="mt-1 w-full rounded border p-2 text-base md:text-sm dark:bg-slate-800 dark:border-slate-700" />
             </label>
             {error && <p className="text-red-600 text-sm">{error}</p>}

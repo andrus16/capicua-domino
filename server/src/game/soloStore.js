@@ -12,7 +12,7 @@ function uid() {
   return `solo_${Date.now().toString(36)}_${seq++}_${Math.floor(Math.random() * 1e6).toString(36)}`;
 }
 
-export function createSoloGame({ numBots = 1, level = "medium", targetScore = 100 } = {}) {
+export function createSoloGame({ numBots = 1, level = "medium", targetScore = 50 } = {}) {
   if (![1, 2, 3].includes(numBots)) throw new Error("numBots debe ser 1-3");
   if (!["easy", "medium", "hard"].includes(level)) throw new Error("level inválido");
   const numPlayers = numBots + 1;

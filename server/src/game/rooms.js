@@ -49,7 +49,7 @@ export function seatOf(room, socketId) {
   return room.players.findIndex((p) => p.socketId === socketId);
 }
 
-export function createRoom(store, { socketId, user, maxPlayers = 4, targetScore = 100 }) {
+export function createRoom(store, { socketId, user, maxPlayers = 4, targetScore = 50 }) {
   if (findRoomOf(store, socketId)) throw new Error("Ya estás en una sala (sal antes de crear otra)");
   if (store.rooms.size >= MAX_ROOMS) throw new Error("Hay demasiadas salas abiertas, intenta en unos minutos");
   const n = Number(maxPlayers);

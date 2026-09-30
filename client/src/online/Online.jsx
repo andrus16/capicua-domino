@@ -19,7 +19,7 @@ export default function Online({ dark, onExit }) {
   const [room, setRoom] = useState(null);
   const [invites, setInvites] = useState([]);
   const [code, setCode] = useState("");
-  const [cfg, setCfg] = useState({ maxPlayers: 2, targetScore: 100 });
+  const [cfg, setCfg] = useState({ maxPlayers: 2, targetScore: 50 });
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -204,7 +204,7 @@ export default function Online({ dark, onExit }) {
               </label>
               <label className="flex-1 text-sm">Meta
                 <input type="number" min={10} max={500} step={10} value={cfg.targetScore}
-                  onChange={(e) => setCfg({ ...cfg, targetScore: Number(e.target.value) || 100 })}
+                  onChange={(e) => setCfg({ ...cfg, targetScore: Number(e.target.value) || 50 })}
                   className="mt-1 w-full rounded border p-2 text-base md:text-sm dark:bg-slate-800 dark:border-slate-700" />
               </label>
             </div>

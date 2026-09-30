@@ -43,7 +43,7 @@ app.use("/api", statsRouter);
 // ---------- Solo vs máquina (Fase 2) ----------
 app.post("/api/solo", (req, res) => {
   try {
-    const { numBots = 1, level = "medium", targetScore = 100 } = req.body ?? {};
+    const { numBots = 1, level = "medium", targetScore = 50 } = req.body ?? {};
     const game = createSoloGame({ numBots: Number(numBots), level, targetScore: Number(targetScore) });
     // Si empieza un bot, que juegue hasta el humano (pensamiento simulado en cliente).
     let guard = 0;
