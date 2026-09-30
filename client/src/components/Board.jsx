@@ -1,9 +1,9 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Tile } from "./Tile.jsx";
 
-/** Columnas según pantalla. */
+/** Columnas según pantalla (fichas mini compactas). */
 function useCols() {
-  const get = () => (typeof window !== "undefined" && window.innerWidth >= 768 ? 12 : 5);
+  const get = () => (typeof window !== "undefined" && window.innerWidth >= 768 ? 12 : 6);
   const [cols, setCols] = useState(get);
   useEffect(() => {
     const f = () => setCols(get());
@@ -66,7 +66,7 @@ export function Board({ board, lastMove, dark = false }) {
               const isLast = lastMove && (lastMove.side === "left" ? i === 0 : i === lastIdx);
               return (
                 <div key={isLast ? `last-${len}` : i} style={{ gridColumn: col, gridRow: r + 1 }}>
-                  <Tile tile={t} dir={isCorner ? "v" : "h"} dark={false}
+                  <Tile tile={t} dir={isCorner ? "v" : "h"} mini dark={false}
                     className={isLast ? "board-tile last-move" : isCorner ? "board-tile" : ""} />
                 </div>
               );
