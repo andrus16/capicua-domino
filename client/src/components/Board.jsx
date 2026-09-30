@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Tile } from "./Tile.jsx";
 
-/** Columnas según pantalla: 4 en teléfono (fichas grandes), 10 en tablet/PC. */
+/** Columnas según pantalla: 5 en teléfono, 12 en tablet/PC (fichas mini). */
 function useCols() {
-  const get = () => (typeof window !== "undefined" && window.innerWidth >= 768 ? 10 : 4);
+  const get = () => (typeof window !== "undefined" && window.innerWidth >= 768 ? 12 : 5);
   const [cols, setCols] = useState(get);
   useEffect(() => {
     const f = () => setCols(get());
@@ -27,19 +27,19 @@ export function Board({ board, lastMove, dark = false }) {
   for (let i = 0; i < board.length; i += cols) rows.push(board.slice(i, i + cols));
   const lastIdx = board.length - 1;
   return (
-    <div className="space-y-2">
+    <div className="py-1">
       {rows.map((rowTiles, r) => {
         const reversed = r % 2 === 1;
         const cornerK = rowTiles.length - 1;
         return (
-          <div key={r} className={`flex gap-1.5 items-center justify-center ${reversed ? "flex-row-reverse" : "flex-row"}`}>
+          <div key={r} className={`flex gap-0 items-center justify-center ${reversed ? "flex-row-reverse" : "flex-row"}`}>
             {rowTiles.map((t, k) => {
               const i = r * cols + k;
               const isCorner = r < rows.length - 1 && k === cornerK;
               const isLast = lastMove && (lastMove.side === "left" ? i === 0 : i === lastIdx);
               return (
                 <Tile key={isLast ? `last-${board.length}` : i} tile={t}
-                  dir={isCorner ? "v" : "h"} small dark={false}
+                  dir={isCorner ? "v" : "h"} mini dark={false}
                   className={isLast ? "board-tile last-move" : isCorner ? "board-tile" : ""} />
               );
             })}

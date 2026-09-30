@@ -9,15 +9,15 @@ const PIPS = {
   6: [[0, 0], [0, 2], [1, 0], [1, 2], [2, 0], [2, 2]],
 };
 
-function Half({ value, dark }) {
+function Half({ value, dark, mini = false }) {
   return (
-    <div className={`grid grid-cols-3 grid-rows-3 w-8 h-8 sm:w-9 sm:h-9 p-1 ${dark ? "bg-slate-800" : "bg-white"}`}>
+    <div className={`grid grid-cols-3 grid-rows-3 ${mini ? "w-6 h-6 p-0.5" : "w-8 h-8 sm:w-9 sm:h-9 p-1"} ${dark ? "bg-slate-800" : "bg-white"}`}>
       {Array.from({ length: 9 }, (_, i) => {
         const r = Math.floor(i / 3), c = i % 3;
         const on = (PIPS[value] ?? []).some(([pr, pc]) => pr === r && pc === c);
         return (
           <div key={i} className="flex items-center justify-center">
-            {on && <div className={`w-1.5 h-1.5 rounded-full ${dark ? "bg-amber-300" : "bg-slate-900"}`} />}
+            {on && <div className={`rounded-full ${mini ? "w-1 h-1" : "w-1.5 h-1.5"} ${dark ? "bg-amber-300" : "bg-slate-900"}`} />}
           </div>
         );
       })}
@@ -25,7 +25,7 @@ function Half({ value, dark }) {
   );
 }
 
-export function Tile({ tile, dir = "v", playable = false, selected = false, small = false, dark = false, onClick, className = "" }) {
+export function Tile({ tile, dir = "v", playable = false, selected = false, small = false, mini = false, dark = false, onClick, className = "" }) {
   const dbl = tile.left === tile.right;
   const cls = [
     "tile-pop rounded-md overflow-hidden border-2 select-none",
@@ -36,8 +36,8 @@ export function Tile({ tile, dir = "v", playable = false, selected = false, smal
     className,
   ].join(" ");
   const inner = dir === "v" || (dir === "h" && dbl)
-    ? <div className="flex flex-col"><Half value={tile.left} dark={dark} /><div className={`h-px ${dark ? "bg-slate-600" : "bg-slate-900"}`} /><Half value={tile.right} dark={dark} /></div>
-    : <div className="flex flex-row"><Half value={tile.left} dark={dark} /><div className={`w-px ${dark ? "bg-slate-600" : "bg-slate-900"}`} /><Half value={tile.right} dark={dark} /></div>;
+    ? <div className="flex flex-col"><Half value={tile.left} dark={dark} mini={mini} /><div className={`h-px ${dark ? "bg-slate-600" : "bg-slate-900"}`} /><Half value={tile.right} dark={dark} mini={mini} /></div>
+    : <div className="flex flex-row"><Half value={tile.left} dark={dark} mini={mini} /><div className={`w-px ${dark ? "bg-slate-600" : "bg-slate-900"}`} /><Half value={tile.right} dark={dark} mini={mini} /></div>;
   return <button className={`touch-manipulation ${cls}`} onClick={onClick} title={`[${tile.left}|${tile.right}]`}>{inner}</button>;
 }
 
