@@ -64,9 +64,15 @@ export function Board({ board, lastMove, dark = false }) {
               const col = reversed ? cols - k : k + 1;
               const isCorner = r < rows.length - 1 && k === rowTiles.length - 1;
               const isLast = lastMove && (lastMove.side === "left" ? i === 0 : i === lastIdx);
+              // En filas impares la cadena se lee de derecha a izquierda:
+              // hay que espejar la ficha para que las caras en contacto
+              // muestren el mismo valor (si no, se ve "al contrario").
+              // La esquina vertical no se espeja: su mitad superior es la entrada.
+              const mirrored = reversed && !isCorner;
+              const disp = mirrored ? { left: t.right, right: t.left } : t;
               return (
                 <div key={isLast ? `last-${len}` : i} style={{ gridColumn: col, gridRow: r + 1 }}>
-                  <Tile tile={t} dir={isCorner ? "v" : "h"} mini dark={false}
+                  <Tile tile={disp} dir={isCorner ? "v" : "h"} mini dark={false}
                     className={isLast ? "board-tile last-move" : isCorner ? "board-tile" : ""} />
                 </div>
               );
