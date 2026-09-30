@@ -40,6 +40,14 @@ export function Board({ board, lastMove, dark = false }) {
   const rows = [];
   for (let i = 0; i < len; i += cols) rows.push(board.slice(i, i + cols));
   const lastIdx = len - 1;
+  const gridStyle = {
+    display: "grid",
+    gridTemplateColumns: `repeat(${cols}, auto)`,
+    justifyContent: "center",
+    alignItems: "center",
+    columnGap: 0,
+    rowGap: 0,
+  };
   return (
     <div style={{ height: naturalH * scale || undefined }} className="overflow-hidden">
       <div
@@ -49,17 +57,20 @@ export function Board({ board, lastMove, dark = false }) {
         <div className="py-1">
           {rows.map((rowTiles, r) => {
             const reversed = r % 2 === 1;
-            const cornerK = rowTiles.length - 1;
             return (
-              <div key={r} className={`flex gap-0 items-center justify-center ${reversed ? "flex-row-reverse" : "flex-row"}`}>
+              <div key={r} style={gridStyle}>
                 {rowTiles.map((t, k) => {
                   const i = r * cols + k;
-                  const isCorner = r < rows.length - 1 && k === cornerK;
+                  // Columna exacta: pares izq→der, impares der→izq. Así todas
+                  // las filas miden lo mismo y las esquinas quedan alineadas.
+                  const col = reversed ? cols - k : k + 1;
+                  const isCorner = r < rows.length - 1 && k === rowTiles.length - 1;
                   const isLast = lastMove && (lastMove.side === "left" ? i === 0 : i === lastIdx);
                   return (
-                    <Tile key={isLast ? `last-${len}` : i} tile={t}
-                      dir={isCorner ? "v" : "h"} dark={false}
-                      className={isLast ? "board-tile last-move" : isCorner ? "board-tile" : ""} />
+                    <div key={isLast ? `last-${len}` : i} style={{ gridColumn: col, gridRow: 1 }}>
+                      <Tile tile={t} dir={isCorner ? "v" : "h"} dark={false}
+                        className={isLast ? "board-tile last-move" : isCorner ? "board-tile" : ""} />
+                    </div>
                   );
                 })}
               </div>
