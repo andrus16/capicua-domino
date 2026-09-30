@@ -54,6 +54,8 @@ con mensaje claro.
 - `GET /api/ranking?limit=50` → `{ranking}` (vista `v_ranking`)
 - `GET /api/users/:id` → perfil público + stats (sin email)
 - `GET /api/users/:id/games?limit=20` → historial de partidas
+- `POST /api/auth/forgot {login}` → envía email con enlace (siempre OK, no enumera; requiere SMTP_*)
+- `POST /api/auth/reset {token, password}` → consume el enlace (un solo uso, 30 min)
 
 ```bash
 npm run db:migrate   # aplica database/schema.sql a DATABASE_URL

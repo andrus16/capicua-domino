@@ -61,6 +61,21 @@ function useAccount(onUser = null) {
 /** Tarjeta de cuenta siempre visible: sesión o login/registro/invitado. */
 export function AccountCard({ onUser = null }) {
   const { user, mode, setMode, form, setForm, error, loading, history, submit, asGuest, logout } = useAccount(onUser);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotLogin, setForgotLogin] = useState("");
+  const [forgotMsg, setForgotMsg] = useState("");
+  const [forgotBusy, setForgotBusy] = useState(false);
+
+  const doForgot = async (e) => {
+    e.preventDefault();
+    setForgotMsg(""); setForgotBusy(true);
+    try {
+      const d = await api.forgot(forgotLogin.trim());
+      setForgotMsg(d.message ?? "Revisa tu correo.");
+    } catch (err) { setForgotMsg(err.message); }
+    finally { setForgotBusy(false); }
+  };
+
   return (
     <div className="rounded-2xl overflow-hidden border-2 border-amber-400 shadow-xl bg-white dark:bg-slate-900">
       <div className="shine-wrap px-4 py-2 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-black">
@@ -119,7 +134,28 @@ export function AccountCard({ onUser = null }) {
               <button disabled={loading} className="w-full py-2 rounded-xl bg-slate-900 dark:bg-slate-700 text-white font-bold disabled:opacity-50">
                 {loading ? "…" : mode === "register" ? "Crear cuenta" : "Entrar"}
               </button>
+              {mode === "login" && !showForgot && (
+                <button type="button" onClick={() => setShowForgot(true)} className="text-xs underline opacity-70">
+                  ¿Olvidaste tu contraseña?
+                </button>
+              )}
             </form>
+            {showForgot && (
+              <form onSubmit={doForgot} className="space-y-2 rounded-xl border border-amber-300 dark:border-amber-700 p-2">
+                <p className="text-xs font-bold">📧 Te enviamos un enlace (vale 30 min)</p>
+                <input placeholder="tu usuario o email" value={forgotLogin}
+                  onChange={(e) => setForgotLogin(e.target.value)}
+                  className="w-full rounded border p-2 text-base md:text-sm dark:bg-slate-800 dark:border-slate-700" />
+                {forgotMsg && <p className="text-xs opacity-80">{forgotMsg}</p>}
+                <div className="flex gap-2">
+                  <button disabled={forgotBusy} className="flex-1 py-1.5 rounded-lg bg-amber-400 text-black text-sm font-bold disabled:opacity-50">
+                    {forgotBusy ? "…" : "Enviar enlace"}
+                  </button>
+                  <button type="button" onClick={() => { setShowForgot(false); setForgotMsg(""); }}
+                    className="px-3 py-1.5 rounded-lg border dark:border-slate-700 text-sm">✕</button>
+                </div>
+              </form>
+            )}
           </div>
         )}
       </div>

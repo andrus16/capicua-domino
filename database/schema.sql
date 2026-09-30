@@ -121,6 +121,20 @@ CREATE TABLE IF NOT EXISTS user_stats (
   CONSTRAINT stats_won_lte_played CHECK (games_won <= games_played)
 );
 
+-- ---------- password_resets ----------
+-- Tokens de un solo uso para recuperar contraseña (se guarda el hash,
+-- nunca el token). Expiran en 30 minutos.
+CREATE TABLE IF NOT EXISTS password_resets (
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+  token_hash  CHAR(64) NOT NULL UNIQUE,
+  expires_at  TIMESTAMPTZ NOT NULL,
+  used_at     TIMESTAMPTZ,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_resets_user ON password_resets (user_id);
+CREATE INDEX IF NOT EXISTS idx_resets_expires ON password_resets (expires_at);
+
 -- ---------- ranking (vista) ----------
 CREATE OR REPLACE VIEW v_ranking AS
 SELECT

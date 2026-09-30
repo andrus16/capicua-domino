@@ -6,6 +6,7 @@ import { AccountCard, RankingCard } from "./components/AuthPanel.jsx";
 import { AnimatedBackdrop } from "./components/Backdrop.jsx";
 import { Logo } from "./components/Logo.jsx";
 import Online from "./online/Online.jsx";
+import { ResetScreen } from "./components/ResetScreen.jsx";
 import { sndPlace, sndWin, sndTurn, sndSelect, sndDraw, sndPass, startMusic, isMuted, toggleMute } from "./sound.js";
 
 const TURN_SECS = 30;
@@ -24,8 +25,7 @@ function sameTile(a, b) {
 }
 
 export default function App() {
-  const [dark, toggleDark] = useDark();
-  const [muted, setMuted] = useState(isMuted());
+  const [dark, toggleDark] = useDark();  const [muted, setMuted] = useState(isMuted());
   const [screen, setScreen] = useState("inicio"); // inicio | mesa | online
   const [cfg, setCfg] = useState({ numBots: 1, level: "medium", targetScore: 50 });
   const [game, setGame] = useState(null);
@@ -38,6 +38,19 @@ export default function App() {
   const [accountUser, setAccountUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("domino_user") ?? "null"); } catch { return null; }
   });
+  // Enlace de recuperación ?reset=TOKEN (viene del email).
+  const [resetToken, setResetToken] = useState(() => {
+    try { return new URLSearchParams(window.location.search).get("reset"); }
+    catch { return null; }
+  });
+  const closeReset = () => {
+    setResetToken(null);
+    try {
+      const u = new URL(window.location.href);
+      u.searchParams.delete("reset");
+      window.history.replaceState(null, "", u.pathname + u.search);
+    } catch { /* noop */ }
+  };
   const timerRef = useRef(null);
   const noticeRef = useRef(null);
 
@@ -160,6 +173,10 @@ export default function App() {
 
   if (screen === "online") {
     return <Online dark={dark} onExit={() => setScreen("inicio")} />;
+  }
+
+  if (resetToken) {
+    return <ResetScreen token={resetToken} onDone={closeReset} />;
   }
 
   if (screen === "inicio") {

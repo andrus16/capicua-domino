@@ -40,6 +40,8 @@ export const api = {
     return d;
   },
   me: () => req("/api/auth/me"),
+  forgot: (login) => req("/api/auth/forgot", { method: "POST", body: JSON.stringify({ login }) }),
+  resetPassword: (token, password) => req("/api/auth/reset", { method: "POST", body: JSON.stringify({ token, password }) }),
   logout: () => token.set(null),
   getToken: token.get,
   ranking: (limit = 50) => req(`/api/ranking?limit=${limit}`),

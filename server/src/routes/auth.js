@@ -8,10 +8,14 @@ import {
   normalizeUsername, normalizeEmail,
 } from "../auth/validators.js";
 import { findUserById, findUserAuthByLogin, createUser, guestUsername, getUserWithStats } from "../db/users.js";
+import { createResetToken, consumeResetToken } from "../db/passwordResets.js";
+import { sendResetEmail, mailConfigured } from "../auth/mailer.js";
 import { dbConfigured } from "../db/pool.js";
 
 export const authRouter = Router();
 authRouter.use(rateLimit({ windowMs: 60_000, max: 60 }));
+// Límite más estricto para recuperación (anti-spam de emails).
+const resetLimit = rateLimit({ windowMs: 60_000, max: 10 });
 
 function needDb(res) {
   if (!dbConfigured) {
@@ -78,4 +82,45 @@ authRouter.get("/me", requireAuth, async (req, res) => {
   const full = await getUserWithStats(req.user.id);
   if (!full) return res.status(404).json({ error: "Usuario no encontrado" });
   res.json({ user: full });
+});
+
+// POST /api/auth/forgot { login } — siempre responde OK (no enumera usuarios)
+authRouter.post("/forgot", resetLimit, async (req, res) => {
+  if (needDb(res)) return;
+  if (!mailConfigured) {
+    return res.status(503).json({ error: "Recuperación por email no configurada todavía" });
+  }
+  const { login } = req.body ?? {};
+  const done = { ok: true, message: "Si existe una cuenta con ese dato, enviamos un correo con el enlace (30 min)." };
+  if (!login || typeof login !== "string") return res.json(done);
+  try {
+    const found = await findUserAuthByLogin(login.trim());
+    // Solo registrados con email reciben correo (invitados no tienen).
+    if (!found || found.is_guest || !found.email) return res.json(done);
+    const token = await createResetToken(found.id);
+    const base = (process.env.CLIENT_URL ?? "").split(",")[0].trim().replace(/\/$/, "");
+    await sendResetEmail({
+      to: found.email,
+      username: found.username,
+      link: `${base}/?reset=${token}`,
+    });
+  } catch (e) {
+    console.error("[forgot]", e.message);
+  }
+  res.json(done);
+});
+
+// POST /api/auth/reset { token, password } — consume el enlace
+authRouter.post("/reset", resetLimit, async (req, res) => {
+  if (needDb(res)) return;
+  const { token, password } = req.body ?? {};
+  const err = validatePassword(password);
+  if (err) return res.status(400).json({ error: err });
+  try {
+    const userId = await consumeResetToken(String(token ?? ""), await hashPassword(password));
+    const user = await findUserById(userId);
+    res.json({ ok: true, message: "Contraseña actualizada, ya puedes entrar", user: publicUser(user) });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 });
