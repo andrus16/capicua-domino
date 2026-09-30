@@ -282,7 +282,7 @@ export default function App() {
       <main className={`flex-1 mx-3 my-2 rounded-xl p-3 min-h-[30vh] relative overflow-hidden ${dark ? "felt-dark" : "felt"}`}>
         <div className="flex items-center justify-between text-white text-sm mb-2">
           <span className="font-bold">◀ {game?.leftEnd ?? "—"}</span>
-          <span className="opacity-80">{game?.board?.length ?? 0} en mesa · sigue ⤵⤷</span>
+          <span className="opacity-80">{game?.board?.length ?? 0} en mesa</span>
           <span className="font-bold">{game?.rightEnd ?? "—"} ▶</span>
         </div>
         <Board board={game?.board ?? []} lastMove={game?.lastMove} dark={dark} />

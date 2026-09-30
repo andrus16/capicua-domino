@@ -328,7 +328,7 @@ export default function Online({ dark, onExit }) {
           <main className={`flex-1 mx-3 my-2 rounded-xl p-3 min-h-[30vh] relative overflow-hidden ${dark ? "felt-dark" : "felt"}`}>
             <div className="flex items-center justify-between text-white text-sm mb-2">
               <span className="font-bold">◀ {room.leftEnd ?? "—"}</span>
-              <span className="opacity-80">Ronda {room.roundNumber} · {room.board?.length ?? 0} en mesa · sigue ⤵⤷</span>
+              <span className="opacity-80">Ronda {room.roundNumber} · {room.board?.length ?? 0} en mesa</span>
               <span className="font-bold">{room.rightEnd ?? "—"} ▶</span>
             </div>
             <Board board={room?.board ?? []} lastMove={room?.lastMove} dark={dark} />
