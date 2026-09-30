@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Tile, TileBack } from "../components/Tile.jsx";
+import { Board } from "../components/Board.jsx";
 import { Logo } from "../components/Logo.jsx";
 import { getSocket, closeSocket, emitAck } from "./socket.js";
 import { sndPlace, sndWin, sndTurn, sndSelect, sndDraw, sndPass } from "../sound.js";
@@ -327,20 +328,10 @@ export default function Online({ dark, onExit }) {
           <main className={`flex-1 mx-3 my-2 rounded-xl p-3 min-h-[30vh] relative overflow-hidden ${dark ? "felt-dark" : "felt"}`}>
             <div className="flex items-center justify-between text-white text-sm mb-2">
               <span className="font-bold">◀ {room.leftEnd ?? "—"}</span>
-              <span className="opacity-80">Ronda {room.roundNumber} · {room.board?.length ?? 0} en mesa</span>
+              <span className="opacity-80">Ronda {room.roundNumber} · {room.board?.length ?? 0} en mesa · sigue ⤵⤷</span>
               <span className="font-bold">{room.rightEnd ?? "—"} ▶</span>
             </div>
-            {(room.board?.length ?? 0) === 0
-              ? <p className="text-white/80 text-center py-8">Mesa vacía.</p>
-              : <div className="flex flex-wrap gap-1.5 justify-center items-center">
-                  {room.board.map((t, i) => {
-                    const isLast = room.lastMove && (room.lastMove.side === "left" ? i === 0 : i === room.board.length - 1);
-                    return (
-                      <Tile key={isLast ? `last-${room.board.length}` : i} tile={t} dir="h" small dark={false}
-                        className={isLast ? "board-tile last-move" : ""} />
-                    );
-                  })}
-                </div>}
+            <Board board={room?.board ?? []} lastMove={room?.lastMove} dark={dark} />
             {notice && <p className="mt-2 text-center text-sm font-bold text-amber-200 bg-black/40 rounded px-2 py-1 tile-pop">{notice}</p>}
           </main>
 

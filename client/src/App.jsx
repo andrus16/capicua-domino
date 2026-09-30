@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { api } from "./api.js";
 import { Tile, TileBack } from "./components/Tile.jsx";
+import { Board } from "./components/Board.jsx";
 import { AccountCard, RankingCard } from "./components/AuthPanel.jsx";
 import { AnimatedBackdrop } from "./components/Backdrop.jsx";
 import { Logo } from "./components/Logo.jsx";
@@ -281,20 +282,10 @@ export default function App() {
       <main className={`flex-1 mx-3 my-2 rounded-xl p-3 min-h-[30vh] relative overflow-hidden ${dark ? "felt-dark" : "felt"}`}>
         <div className="flex items-center justify-between text-white text-sm mb-2">
           <span className="font-bold">◀ {game?.leftEnd ?? "—"}</span>
-          <span className="opacity-80">{game?.board?.length ?? 0} en mesa</span>
+          <span className="opacity-80">{game?.board?.length ?? 0} en mesa · sigue ⤵⤷</span>
           <span className="font-bold">{game?.rightEnd ?? "—"} ▶</span>
         </div>
-        {(game?.board?.length ?? 0) === 0
-          ? <p className="text-white/80 text-center py-8">Mesa vacía — juega tu mejor ficha.</p>
-          : <div className="flex flex-wrap gap-1.5 justify-center items-center">
-              {game.board.map((t, i) => {
-                const isLast = game.lastMove && (game.lastMove.side === "left" ? i === 0 : i === game.board.length - 1);
-                return (
-                  <Tile key={isLast ? `last-${game.board.length}` : i} tile={t} dir="h" small dark={false}
-                    className={isLast ? "board-tile last-move" : ""} />
-                );
-              })}
-            </div>}
+        <Board board={game?.board ?? []} lastMove={game?.lastMove} dark={dark} />
         {notice && <p className="mt-2 text-center text-sm font-bold text-amber-200 bg-black/40 rounded px-2 py-1 tile-pop">{notice}</p>}
         {error && <p className="mt-2 text-amber-200 bg-red-800/70 rounded px-2 py-1 text-sm">{error}</p>}
       </main>
